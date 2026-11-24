@@ -2,10 +2,14 @@
 import numpy as np  # matrixالمكتبة الخاصه بال 
 import matplotlib.pyplot as plt #ده علشان يرسم الشكل
 from PIL import Image  #هنا علشان احط  الصورة
-IMAGE_PATH = "test_image.png" #ده اسم الصورة قلي انا منزلها
+IMAGE_PATH = "test_image.png" 
+ANGLE = 0
+SX = 1
+SY = 1                    #ده اسم الصورة قلي انا منزلها
 
-M = np.array([[1,  0], #   x,yركزوا معايا هنا اللعب كله لية علشان لو خلتها زي ما هي كده هي نحيه الموجابة من 
-              [0, -1]] )#يعني حرف ال فيfirst quad 
+FLIP = np.array([[1,  0],
+                 [ 0, -1]])  #   x,yركزوا معايا هنا اللعب كله لية علشان لو خلتها زي ما هي كده هي نحيه الموجابة من 
+              #يعني حرف ال فيfirst quad 
               # طب ليه 2*2 علشان ده 2ديه 
               # مينفعش يكون العمود في 2 زيرو علشان كده   Determinat=0 no inverse       
 
@@ -16,6 +20,18 @@ def load_image(path):#الدالة دي بتاخد الpath الصورة
     print("Image shape (h, w, channels):", A.shape)#بيطبع ارتفاع وعرض الصورة
     print("Pixel [20, 20] =", A[20, 20])#دي المفروض انت حاتها علشان RGB[90,90,90]
     return A
+
+
+def rotation_matrix(theta_deg):
+    t = np.radians(theta_deg)   # numpy بتشتغل بالراديان مش بالدرجات
+    return np.array([[np.cos(t), -np.sin(t)],
+                     [np.sin(t),  np.cos(t)]])
+
+
+
+def scaling_matrix(sx, sy):
+    return np.array([[sx, 0],
+                     [0, sy]])
 
 
 
@@ -43,7 +59,7 @@ def plot_F(M):#بتاخد المصفوفة Mدي بتاعت ال2ديه وبتض
 
 def transform_image(A, M):#لفانكشن بتاخد صورتك A والمصفوفة M
     h, w = A.shape[:2] #ده بيخلني اخد قمتين من الصورة الطول و العرض
-    cx, cy = (w - 1) / 2, (h - 1) / 2       #وهنا انا بحسب النقطة    
+    cx, cy = (w - 1) / 2, (h - 1) / 2     #وهنا انا بحسب النقطة    
 
     corners = np.array([[-cx, cx, cx, -cx], #فيها الأركان الأربعة للصورة، كل عمود ركن (x, y)، زي F بالظبط. وبما إن المركز بقى (0,0)، الأركا
                         [ cy, cy, -cy, -cy]])
@@ -87,10 +103,13 @@ def plot_image(A, M):#الصورة القديمة
     plt.tight_layout()
 
 if __name__ == "__main__":
-    print("M =\n", M)
-    A = load_image(IMAGE_PATH)
-    A = change_colors(A, (255, 0, 0))
-    plot_F(M)
-    plot_image(A, M)
-    plt.show()
+        R = rotation_matrix(ANGLE)
+        S = scaling_matrix(SX, SY)
+        M = R @ FLIP
+        print("M =\n", M)
+        A = load_image(IMAGE_PATH)
+        A = change_colors(A, (0, 0, 0))
+        plot_F(M)
+        plot_image(A, M)
+        plt.show()
 
